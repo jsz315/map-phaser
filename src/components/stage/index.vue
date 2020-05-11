@@ -11,6 +11,8 @@
         <div class="tip">y: {{y}}</div>
         <div class="tip">clientX: {{clientX}}</div>
         <div class="tip">clientY: {{clientY}}</div>
+        <div class="tip">centerX: {{centerX}}</div>
+        <div class="tip">centerY: {{centerY}}</div>
       </div>
   </div>
 </template>
@@ -36,7 +38,9 @@ export default {
       x: 0,
       y: 0,
       clientX: 0,
-      clientY: 0
+      clientY: 0,
+      centerX: 0,
+      centerY: 0
     }
   },
   props: {
@@ -47,7 +51,7 @@ export default {
   },
   mounted(){
     var canvas = this.$refs.canvas;
-    game.init(canvas);
+    // game.init(canvas);
     this.useMine(canvas);
   },
   methods: {
@@ -60,6 +64,8 @@ export default {
           listener.emit("scale", num);
         },
         onCenter: (x, y)=>{
+          this.centerX = x / window.innerWidth * 750;
+          this.centerY = y / window.innerWidth * 750;
           listener.emit("center", x / window.innerWidth * 750, y / window.innerWidth * 750);
         },
         onMove: (x, y)=>{

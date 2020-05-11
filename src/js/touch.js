@@ -18,6 +18,8 @@ function init(param){
         moving = true;
         var ts = e.targetTouches;
         console.log(e);
+        e.preventDefault();
+        
         if(ts.length == 1){
             startPoint = toPoint(ts[0]);
             onTap(startPoint.x, startPoint.y);
@@ -25,7 +27,7 @@ function init(param){
         else if(ts.length == 2){
             startPoint = getCenter(ts[0], ts[1]);
             startDistance = getDistance(ts[0], ts[1]);
-            onCenter(startPoint);
+            onCenter(startPoint.x, startPoint.y);
         }
 
         var moveEvent = listener.make(dom, 'touchmove', onTouchMove);
@@ -43,6 +45,8 @@ function init(param){
         if(!moving){
             return;
         }
+        e.preventDefault();
+
         var ts = e.targetTouches;
         var endPoint;
         if(ts.length == 1){

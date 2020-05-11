@@ -11,6 +11,8 @@ export class StartScene extends Phaser.Scene {
   stageScale: number = 1;
   stageX: number = 0;
   stageY: number = 0;
+  centerX: number = 0;
+  centerY: number = 0;
   container: Phaser.GameObjects.Container;
   curView: any;
   sx:number = 0;
@@ -95,8 +97,14 @@ export class StartScene extends Phaser.Scene {
       var newX = this.container.scale * this.stageWidth;
       var newY = this.container.scale * this.stageHeight;
 
-      this.container.x -= (newX - oldX) / 2;
-      this.container.y -= (newY - oldY) / 2;
+      // this.container.x -= (newX - oldX) / 2;
+      // this.container.y -= (newY - oldY) / 2;
+
+      var offsetX = this.centerX / this.stageWidth;
+      var offsetY = this.centerY / this.stageHeight;
+      console.log(offsetX, offsetY);
+      this.container.x -= (newX - oldX) * offsetX;
+      this.container.y -= (newY - oldY) * offsetY;
     })
 
     // this.stage.setInteractive();
@@ -110,17 +118,28 @@ export class StartScene extends Phaser.Scene {
       this.container.scale = this.stageScale * num;
       var newX = this.container.scale * this.stageWidth;
       var newY = this.container.scale * this.stageHeight;
-      this.container.x -= (newX - oldX) / 2;
-      this.container.y -= (newY - oldY) / 2;
+      // this.container.x -= (newX - oldX) / 2;
+      // this.container.y -= (newY - oldY) / 2;
+      var offsetX = this.centerX / this.stageWidth;
+      var offsetY = this.centerY / this.stageHeight;
+      console.log(offsetX, offsetY);
+      this.container.x -= (newX - oldX) * offsetX;
+      this.container.y -= (newY - oldY) * offsetY;
     })
 
     listener.on("center", (x:number, y:number)=>{
       // worldToContainer(x, y)
       this.updateDrawView(x, y);
+      var p = this.worldToContainer(x, y);
+      this.centerX = p.x;
+      this.centerY = p.y;
     })
 
     listener.on("tap", (x:number,y:number)=>{
       this.updateDrawView(x, y);
+      var p = this.worldToContainer(x, y);
+      this.centerX = p.x;
+      this.centerY = p.y;
     })
 
     listener.on("move", (x:number, y:number)=>{
