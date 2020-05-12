@@ -5,9 +5,10 @@ function init(param){
     var dom = param.dom;
     var onScale = param.onScale || function(n){};
     var onCenter = param.onCenter || function(x, y){};
-    var onMove = param.onMove || function(x, y){};
+    var onMove = param.onMove || function(x, y, total){};
     var onEnd = param.onEnd || function(){};
     var onTap = param.onTap || function(x, y){};
+    var onSelect = param.onSelect || function(x, y){};
     var isMobile = checkMobile();
 
     var moving = false;
@@ -51,13 +52,16 @@ function init(param){
         var endPoint;
         if(ts.length == 1){
             endPoint = toPoint(ts[0]);
+            // endPoint && onMove(endPoint.x - startPoint.x, endPoint.y - startPoint.y);
+            onSelect(endPoint.x, endPoint.y);
         }
         else if(ts.length == 2){
             endPoint = getCenter(ts[0], ts[1]);
             var endDistance = getDistance(ts[0], ts[1]);
             startDistance && onScale(endDistance / startDistance);
-            endPoint && onMove(endPoint.x - startPoint.x, endPoint.y - startPoint.y);
+            // endPoint && onMove(endPoint.x - startPoint.x, endPoint.y - startPoint.y);
         }
+        endPoint && onMove(endPoint.x - startPoint.x, endPoint.y - startPoint.y, ts.length);
     }
 }
 

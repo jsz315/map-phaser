@@ -51,7 +51,7 @@ export default {
   },
   mounted(){
     var canvas = this.$refs.canvas;
-    // game.init(canvas);
+    game.init(canvas);
     this.useMine(canvas);
   },
   methods: {
@@ -64,14 +64,16 @@ export default {
           listener.emit("scale", num);
         },
         onCenter: (x, y)=>{
-          this.centerX = x / window.innerWidth * 750;
-          this.centerY = y / window.innerWidth * 750;
-          listener.emit("center", x / window.innerWidth * 750, y / window.innerWidth * 750);
+          var p = this.toCanvas(x, y);
+          this.centerX = p.x;
+          this.centerY = p.y;
+          listener.emit("center", p.x, p.y);
         },
-        onMove: (x, y)=>{
-          vm.x = x;
-          vm.y = y;
-          listener.emit("move", x, y);
+        onMove: (x, y, total)=>{
+          var p = this.toCanvas(x, y);
+          vm.x = p.x;
+          vm.y = p.y;
+          listener.emit("move", p.x, p.y, total);
         },
         onEnd: ()=>{
           listener.emit("end");
@@ -79,9 +81,20 @@ export default {
         onTap: (x, y)=>{
           vm.clientX = x;
           vm.clientY = y;
-          listener.emit("tap", x / window.innerWidth * 750, y / window.innerWidth * 750);
+          var p = this.toCanvas(x, y);
+          listener.emit("tap", p.x, p.y);
+        },
+        onSelect: (x, y)=>{
+          var p = this.toCanvas(x, y);
+          listener.emit("select", p.x, p.y);
         }
       });
+    },
+    toCanvas(x, y){
+      return {
+        x: x / window.innerWidth * 750,
+        y: y / window.innerWidth * 750
+      }
     },
     useHammer(canvas){
       // var vm = this;

@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import listener from "./listener.js";
 import {ViewFactory} from './ViewFactory'
 import Tooler from './tooler';
+import {MapView} from './MapView';
 
 export class StartScene extends Phaser.Scene {
   stage: Phaser.GameObjects.Polygon;
@@ -20,6 +21,10 @@ export class StartScene extends Phaser.Scene {
   hole: Phaser.GameObjects.Graphics;
   drawing:boolean = false;
   rects: any[] = [];
+  center:any = {};
+  offset:any = {};
+  size:number = 80;
+  mapView: MapView;
 
   constructor() {
     super({
@@ -37,51 +42,18 @@ export class StartScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.container = this.add.container(0, 0);
-    this.hole = this.add.graphics();
-
     this.stageWidth = Number(this.game.config.width);
     this.stageHeight = Number(this.game.config.height);
-    
-    this.resetStage();
-    this.addEvent();
-    this.addPolygons();
+    this.container = this.add.container(0, 0);
 
-    setTimeout(() => {
+    this.mapView = new MapView(this, this.stageWidth, this.stageHeight, this.size);
+    this.container.add(this.mapView);
+    this.hole = this.add.graphics();
 
-    }, 3000);
-  }
-
-  addPolygons(){
-    this.rects = [];
-    var w = 20;
-    var h = 20;
-    var col = Math.ceil(this.stageWidth / w);
-    var row = Math.ceil(this.stageHeight / h);
-    for(var i = 0; i < row; i++){
-      this.rects[i] = [];
-      for(var j = 0; j < col; j++){
-        // var color = Math.floor(Math.random() * 0xffffff);
-        var color = 0x999999;
-        var rect = ViewFactory.makeRect(this, color, w, h);
-        this.container.add(rect);
-        rect.x = j * w;
-        rect.y = i * h;
-        this.rects[i][j] = rect;
-      }
-
-    }
-  }
-
-  resetStage(){
-    if(this.stage){
-      this.stage.destroy(true);
-    }
-    this.stage = ViewFactory.makeRect(this, this.stageColor, this.stageWidth, this.stageHeight);
-    this.container.addAt(this.stage, 0);
-    this.container.width = this.stageWidth;
-    this.container.height = this.stageHeight;
+    // this.container.width = this.stageWidth;
+    // this.container.height = this.stageHeight;
     this.resetHole();
+    this.addEvent();
   }
 
   addEvent(){
@@ -97,14 +69,26 @@ export class StartScene extends Phaser.Scene {
       var newX = this.container.scale * this.stageWidth;
       var newY = this.container.scale * this.stageHeight;
 
-      // this.container.x -= (newX - oldX) / 2;
-      // this.container.y -= (newY - oldY) / 2;
 
-      var offsetX = this.centerX / this.stageWidth;
-      var offsetY = this.centerY / this.stageHeight;
-      console.log(offsetX, offsetY);
-      this.container.x -= (newX - oldX) * offsetX;
-      this.container.y -= (newY - oldY) * offsetY;
+      if(e.clientX == this.center.x && e.clientY == this.center.y){
+        this.container.x -= (newX - oldX) * this.offset.x;
+        this.container.y -= (newY - oldY) * this.offset.y;
+      }
+      else{
+        console.log(this.game.canvas.offsetLeft, this.game.canvas.offsetTop, "offset")
+        var sx = e.clientX - this.game.canvas.offsetLeft;
+        var sy = e.clientY - this.game.canvas.offsetTop;
+        var center = this.worldToContainer(sx, sy);
+  
+        var offsetX = center.x / this.stageWidth;
+        var offsetY = center.y / this.stageHeight;
+        console.log(offsetX, offsetY);
+        this.container.x -= (newX - oldX) * offsetX;
+        this.container.y -= (newY - oldY) * offsetY;
+        this.offset = {x: offsetX, y: offsetY};
+      }
+
+      this.center = {x: e.clientX, y: e.clientY};
     })
 
     // this.stage.setInteractive();
@@ -137,20 +121,27 @@ export class StartScene extends Phaser.Scene {
 
     listener.on("tap", (x:number,y:number)=>{
       this.updateDrawView(x, y);
-      var p = this.worldToContainer(x, y);
-      this.centerX = p.x;
-      this.centerY = p.y;
+      // var p = this.worldToContainer(x, y);
+      // this.centerX = p.x;
+      // this.centerY = p.y;
     })
 
-    listener.on("move", (x:number, y:number)=>{
-      this.container.x = this.stageX + x;
-      this.container.y = this.stageY + y;
+    listener.on("move", (x:number, y:number, total:number)=>{
+      if(total > 1){
+        this.container.x = this.stageX + x;
+        this.container.y = this.stageY + y;
+      }
     })
 
     listener.on("end", ()=>{
       this.stageScale = this.container.scale;
       this.stageX = this.container.x;
       this.stageY = this.container.y;
+    })
+
+    listener.on("select", (x:number,y:number)=>{
+      this.updateDrawView(x, y);
+      // var p = this.worldToContainer(x, y);
     })
   }
 
@@ -173,13 +164,24 @@ export class StartScene extends Phaser.Scene {
   }
 
   updateDrawView(x:number, y:number){
-    // x = (x - this.container.x) / this.container.scale;
-    // y = (y - this.container.y) / this.container.scale;
     var p = this.worldToContainer(x, y)
-    var col = Math.floor(p.x / 20);
-    var row = Math.floor(p.y / 20);
-    if(this.rects[row] && this.rects[row][col]){
-      this.rects[row][col].fillColor = 0xffffff;
+    var col = Math.floor(p.x / this.size);
+    var row = Math.floor(p.y / this.size);
+    // if(this.rects[row] && this.rects[row][col]){
+    //   this.toggleColor(this.rects[row][col]);
+    // }
+    this.mapView.setFree(row, col);
+  }
+
+  toggleColor(view: any){
+    if(view){
+      // if(view.fillColor == 0xffffff){
+      //   view.fillColor = 0x000000;
+      // }
+      // else{
+      //   view.fillColor = 0xffffff;
+      // }
+      view.fillColor = 0xffffff;
     }
   }
 
