@@ -26,32 +26,33 @@ export class ShortPath{
         console.log("查找完毕");
         running = false;
       }
-      else if(ShortPath.checkSame(curPoint, end)){
-        console.log("成功找到");
-        running = false;
+      else{
+        if(ShortPath.checkSame(curPoint, end)){
+          console.log("成功找到");
+          running = false;
+        }
+        if(!ShortPath.checkContain(this.closeList, curPoint)){
+          this.closeList.push(curPoint);
+        }
       }
       if(running){
         var aroundList = this.getAroundPoint(start);
         console.log(aroundList.length, "total");
         aroundList.forEach((point:Point) => {
-          var isHas = ShortPath.checkContain(this.closeList, point);
-          if(!isHas){
-            if(!ShortPath.checkContain(this.openList, point)){
-              this.openList.push(point);
-              ShortPath.calculateCost(start, end, point);
-              point.parent = curPoint;
-            }
-            else{
+          if(!ShortPath.checkContain(this.closeList, point)){
+            if(ShortPath.checkContain(this.openList, point)){
               ShortPath.updateCost(point);
               if(point.cost < curPoint.cost){
                 point.parent = curPoint;
               }
             }
+            else{
+              this.openList.push(point);
+              ShortPath.calculateCost(start, end, point);
+              point.parent = curPoint;
+            }
           }
         })
-        if(!ShortPath.checkContain(this.closeList, curPoint)){
-          this.closeList.push(curPoint);
-        }
       }
     }
     return this.closeList;
