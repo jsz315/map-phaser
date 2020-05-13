@@ -25,10 +25,10 @@ export class MapData{
     reset(){
         // this.data = [];
         this.points = [];
-        for(var i = 0; i < this.col; i++){
+        for(var i = 0; i < this.row; i++){
             // this.data[i] = [];
             this.points[i] = [];
-            for(var j = 0; j < this.row; j++){
+            for(var j = 0; j < this.col; j++){
                 // this.data[i][j] = MapData.TYPE_BLOCK;
                 this.points[i][j] = new Point(i, j);
                 this.points[i][j].type = MapData.TYPE_BLOCK;
@@ -37,8 +37,8 @@ export class MapData{
     }
 
     find(type:number):any{
-        for(var i = 0; i < this.col; i++){
-            for(var j = 0; j < this.row; j++){
+        for(var i = 0; i < this.row; i++){
+            for(var j = 0; j < this.col; j++){
                 if(this.points[i][j].type == type){
                     return this.points[i][j];
                 }

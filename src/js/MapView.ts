@@ -25,8 +25,8 @@ export class MapView extends Phaser.GameObjects.Container {
     }
 
     changeType(i:number, j:number, type:number){
-      if(i >= 0 && i < this.mapData.col){
-        if(j >= 0 && j < this.mapData.row){
+      if(i >= 0 && i < this.mapData.row){
+        if(j >= 0 && j < this.mapData.col){
           this.mapData.points[i][j].type = type;
           this.update();
         }
