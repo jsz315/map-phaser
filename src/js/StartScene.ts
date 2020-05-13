@@ -4,6 +4,8 @@ import {ViewFactory} from './ViewFactory'
 import Tooler from './tooler';
 import {MapView} from './MapView';
 import { MapData } from './MapData';
+import { ShortPath } from './ShortPath';
+import { Point } from './Point';
 
 export class StartScene extends Phaser.Scene {
   stage: Phaser.GameObjects.Polygon;
@@ -27,6 +29,7 @@ export class StartScene extends Phaser.Scene {
   size:number = 80;
   mapView: MapView;
   clickType: number = MapData.TYPE_FREE;
+  shortPath: ShortPath;
 
   constructor() {
     super({
@@ -51,6 +54,8 @@ export class StartScene extends Phaser.Scene {
     this.mapView = new MapView(this, this.stageWidth, this.stageHeight, this.size);
     this.container.add(this.mapView);
     this.hole = this.add.graphics();
+
+    this.shortPath = new ShortPath(this.mapView.mapData);
 
     // this.container.width = this.stageWidth;
     // this.container.height = this.stageHeight;
@@ -149,12 +154,15 @@ export class StartScene extends Phaser.Scene {
       this.clickType = type;
     });
 
-    listener.on("test", (type:number)=>{
-      // this.clickType = type;
+    listener.on("test", ()=>{
+      var start:Point = this.mapView.mapData.find(MapData.TYPE_PLAYER);
+      var end:Point = this.mapView.mapData.find(MapData.TYPE_AIM);
+      var list = this.shortPath.find(start, end);
+      console.log(list);
     });
 
-    listener.on("reset", (type:number)=>{
-      this.clickType = type;
+    listener.on("reset", ()=>{
+      this.clickType = MapData.TYPE_FREE;
       this.container.x = 0;
       this.container.y = 0;
       this.container.scale = 1;
@@ -184,22 +192,7 @@ export class StartScene extends Phaser.Scene {
     var p = this.worldToContainer(x, y)
     var col = Math.floor(p.x / this.size);
     var row = Math.floor(p.y / this.size);
-    // if(this.rects[row] && this.rects[row][col]){
-    //   this.toggleColor(this.rects[row][col]);
-    // }
     this.mapView.changeType(row, col, this.clickType);
-  }
-
-  toggleColor(view: any){
-    if(view){
-      // if(view.fillColor == 0xffffff){
-      //   view.fillColor = 0x000000;
-      // }
-      // else{
-      //   view.fillColor = 0xffffff;
-      // }
-      view.fillColor = 0xffffff;
-    }
   }
 
   worldToContainer(x:number, y:number){

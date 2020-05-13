@@ -25,24 +25,24 @@ export class MapView extends Phaser.GameObjects.Container {
     }
 
     changeType(i:number, j:number, type:number){
-      if(i >= 0 && i < this.mapData.row){
-        if(j >= 0 && j < this.mapData.col){
-          this.mapData.data[i][j] = type;
+      if(i >= 0 && i < this.mapData.col){
+        if(j >= 0 && j < this.mapData.row){
+          this.mapData.points[i][j].type = type;
           this.update();
         }
       }
     }
 
     setFree(i:number, j:number){
-        if(this.mapData.data[i] && this.mapData.data[i][j]){
-            this.mapData.data[i][j] = MapData.TYPE_FREE;
+        if(this.mapData.points[i] && this.mapData.points[i][j]){
+            this.mapData.points[i][j].type = MapData.TYPE_FREE;
             this.update();
         }
     }
 
     setBlock(i:number, j:number){
-        if(this.mapData.data[i] && this.mapData.data[i][j]){
-            this.mapData.data[i][j] = MapData.TYPE_BLOCK;
+        if(this.mapData.points[i] && this.mapData.points[i][j]){
+            this.mapData.points[i][j].type = MapData.TYPE_BLOCK;
             this.update();
         }
     }
@@ -64,7 +64,7 @@ export class MapView extends Phaser.GameObjects.Container {
 
     getColor(i:number, j:number):number{
       var color:number = 0;
-      switch(this.mapData.data[i][j]){
+      switch(this.mapData.points[i][j].type){
         case MapData.TYPE_FREE:
           color = MapView.COLOR_FREE;
           break
