@@ -3,6 +3,7 @@ import listener from "./listener.js";
 import {ViewFactory} from './ViewFactory'
 import Tooler from './tooler';
 import {MapView} from './MapView';
+import { MapData } from './MapData';
 
 export class StartScene extends Phaser.Scene {
   stage: Phaser.GameObjects.Polygon;
@@ -25,6 +26,7 @@ export class StartScene extends Phaser.Scene {
   offset:any = {};
   size:number = 80;
   mapView: MapView;
+  clickType: number = MapData.TYPE_FREE;
 
   constructor() {
     super({
@@ -141,8 +143,23 @@ export class StartScene extends Phaser.Scene {
 
     listener.on("select", (x:number,y:number)=>{
       this.updateDrawView(x, y);
-      // var p = this.worldToContainer(x, y);
     })
+
+    listener.on("change_type", (type:number)=>{
+      this.clickType = type;
+    });
+
+    listener.on("test", (type:number)=>{
+      // this.clickType = type;
+    });
+
+    listener.on("reset", (type:number)=>{
+      this.clickType = type;
+      this.container.x = 0;
+      this.container.y = 0;
+      this.container.scale = 1;
+    });
+    
   }
 
   drawStart(pointer:any){
@@ -170,7 +187,7 @@ export class StartScene extends Phaser.Scene {
     // if(this.rects[row] && this.rects[row][col]){
     //   this.toggleColor(this.rects[row][col]);
     // }
-    this.mapView.setFree(row, col);
+    this.mapView.changeType(row, col, this.clickType);
   }
 
   toggleColor(view: any){

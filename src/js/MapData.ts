@@ -5,8 +5,10 @@ export class MapData{
     size:number;
     data:any;
 
-    static TYPE_BLOCK:number = 1;
     static TYPE_FREE:number = 0;
+    static TYPE_BLOCK:number = 1;
+    static TYPE_AIM:number = 2;
+    static TYPE_PLAYER:number = 3;
 
     constructor(row:number, col:number, size:number){
         this.row = row;

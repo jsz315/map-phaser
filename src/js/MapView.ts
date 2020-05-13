@@ -10,6 +10,8 @@ export class MapView extends Phaser.GameObjects.Container {
 
     static COLOR_BLOCK:number = 0x000000;
     static COLOR_FREE:number = 0xffffff;
+    static COLOR_AIM:number = 0xff0000;
+    static COLOR_PLAYER:number = 0xff8844;
 
     constructor(scene:Phaser.Scene, width:number, height:number, size:number){
         super(scene);
@@ -20,6 +22,15 @@ export class MapView extends Phaser.GameObjects.Container {
         var row = Math.ceil(height / this.size);
         this.mapData = new MapData(row, col, this.size);
         this.createViews();
+    }
+
+    changeType(i:number, j:number, type:number){
+      if(i >= 0 && i < this.mapData.row){
+        if(j >= 0 && j < this.mapData.col){
+          this.mapData.data[i][j] = type;
+          this.update();
+        }
+      }
     }
 
     setFree(i:number, j:number){
@@ -52,10 +63,22 @@ export class MapView extends Phaser.GameObjects.Container {
     }
 
     getColor(i:number, j:number):number{
-        if(this.mapData.data[i][j] == MapData.TYPE_BLOCK){
-            return MapView.COLOR_BLOCK;
-        }
-        return MapView.COLOR_FREE;
+      var color:number = 0;
+      switch(this.mapData.data[i][j]){
+        case MapData.TYPE_FREE:
+          color = MapView.COLOR_FREE;
+          break
+        case MapData.TYPE_BLOCK:
+          color = MapView.COLOR_BLOCK;
+          break
+        case MapData.TYPE_AIM:
+          color = MapView.COLOR_AIM;
+          break
+        case MapData.TYPE_PLAYER:
+          color = MapView.COLOR_PLAYER;
+          break
+      }
+      return color;
     }
 
     update(){

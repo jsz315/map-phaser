@@ -3,6 +3,13 @@
       <canvas class="canvas" ref="canvas"></canvas>
       <File ref="file"/>
       <Setting ref="setting"/>
+      <div class="btns">
+        <div class="btn" @click="onDraw">绘图</div>
+        <div class="btn" @click="onStart">起点</div>
+        <div class="btn" @click="onAim">终点</div>
+        <div class="btn" @click="onTest">测试</div>
+        <div class="btn" @click="onReset">重置</div>
+      </div>
       <div class="debug">
         <div class="tip">type: {{type}}</div>
         <div class="tip">scale: {{scale}}</div>
@@ -22,6 +29,7 @@
 // import Hammer from 'hammerjs';
 import game from '../../js/App.ts'
 import listener from '../../js/listener'
+import {MapData} from '../../js/MapData'
 import touch from '../../js/touch'
 import File from '../file/index.vue'
 import Setting from '../setting/index.vue'
@@ -55,6 +63,21 @@ export default {
     this.useMine(canvas);
   },
   methods: {
+    onDraw(){
+      listener.emit("change_type", MapData.TYPE_FREE);
+    },
+    onStart(){
+      listener.emit("change_type", MapData.TYPE_PLAYER);
+    },
+    onAim(){
+      listener.emit("change_type", MapData.TYPE_AIM);
+    },
+    onTest(){
+      listener.emit("test");
+    },
+    onReset(){
+      listener.emit("reset");
+    },
     useMine(canvas){
       var vm = this;
       touch.init({
