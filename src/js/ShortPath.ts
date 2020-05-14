@@ -6,21 +6,18 @@ export class ShortPath{
   mapData:MapData;
   openList:Array<Point>;
   closeList:Array<Point>;
-  resultList:Array<Point>;
 
   constructor(mapData:MapData){
     this.mapData = mapData;
   }
   
   find(start:Point, end:Point):Array<Point>{
-
     this.openList= [];
     this.closeList = [];
     this.openList.push(start);
     var running:boolean = true;
-    var timer:number = 0;
+    var timer:number = Date.now();
     while(running){
-      console.log("timer", ++timer);
       var curPoint:Point = this.popMinCostPoint(start, end);
       if(curPoint == null){
         console.log("查找完毕");
@@ -28,7 +25,7 @@ export class ShortPath{
       }
       else{
         if(ShortPath.checkSame(curPoint, end)){
-          console.log("成功找到");
+          console.log("查找成功");
           running = false;
         }
         if(!ShortPath.checkContain(this.closeList, curPoint)){
@@ -41,7 +38,7 @@ export class ShortPath{
         aroundList.forEach((point:Point) => {
           if(!ShortPath.checkContain(this.closeList, point)){
             if(ShortPath.checkContain(this.openList, point)){
-              ShortPath.updateCost(point);
+              ShortPath.updateCost(end, point);
               if(point.cost < curPoint.cost){
                 point.parent = curPoint;
               }
@@ -56,10 +53,17 @@ export class ShortPath{
       }
     }
     var aim = [end];
-    var node = end;
+    var node = aim[0];
     while(node.parent){
       aim.push(node.parent);
       node = node.parent
+    }
+    aim.reverse();
+    if(aim[0] == start){
+      console.log("查找成功, 耗时：", Date.now() - timer);
+    }
+    else{
+      console.log("查找失败, 耗时：", Date.now() - timer);
     }
     return aim;
   }
@@ -98,9 +102,6 @@ export class ShortPath{
     var min = Infinity;
     var id:number = 0;
     this.openList.forEach((point:Point, index:number) => {
-      // if(point.cost == 0){
-      //   ShortPath.calculateCost(start, end, point);
-      // }
       ShortPath.calculateCost(start, end, point);
       if(point.cost < min){
         aim = point;
@@ -122,11 +123,18 @@ export class ShortPath{
     point.cost = point.toStart + point.toEnd;
   }
 
-  static updateCost(point:Point){
-    point.cost = point.toEnd + point.parent.toStart + ShortPath.getDistance(point, point.parent);
+  static recalculateCost(point:Point, parent: Point){
+    return point.toEnd + ShortPath.getDistance(point, parent) + parent.toStart;
+  }
+
+  static updateCost(end:Point, point:Point){
+    point.toStart = ShortPath.getDistance(point.parent, point) + point.parent.toStart;
+    point.toEnd = ShortPath.getDistance(end, point);
+    point.cost = point.toStart + point.toEnd;
   }
 
   static getDistance(a:Point, b:Point):number{
-    return Math.sqrt(Math.pow(a.row - b.row, 2) + Math.pow(a.col - b.col, 2));
+    // return Math.sqrt(Math.pow(a.row - b.row, 2) + Math.pow(a.col - b.col, 2));
+    return Math.abs(a.row - b.row) + Math.abs(a.col - b.col);
   }
 }

@@ -81,6 +81,11 @@ export class MapView extends Phaser.GameObjects.Container {
       return color;
     }
 
+    reset(){
+      this.mapData.reset();
+      this.update();
+    }
+
     update(){
         for(var i = 0; i < this.mapData.row; i++){
             for(var j = 0; j < this.mapData.col; j++){

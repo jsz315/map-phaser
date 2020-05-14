@@ -21,12 +21,11 @@ export class StartScene extends Phaser.Scene {
   curView: any;
   sx:number = 0;
   sy:number = 0;
-  hole: Phaser.GameObjects.Graphics;
   drawing:boolean = false;
   rects: any[] = [];
   center:any = {};
   offset:any = {};
-  size:number = 80;
+  size:number = 16;
   mapView: MapView;
   clickType: number = MapData.TYPE_FREE;
   shortPath: ShortPath;
@@ -53,13 +52,8 @@ export class StartScene extends Phaser.Scene {
 
     this.mapView = new MapView(this, this.stageWidth, this.stageHeight, this.size);
     this.container.add(this.mapView);
-    this.hole = this.add.graphics();
 
     this.shortPath = new ShortPath(this.mapView.mapData);
-
-    // this.container.width = this.stageWidth;
-    // this.container.height = this.stageHeight;
-    this.resetHole();
     this.addEvent();
   }
 
@@ -171,19 +165,18 @@ export class StartScene extends Phaser.Scene {
       this.container.x = 0;
       this.container.y = 0;
       this.container.scale = 1;
+      this.mapView.reset();
     });
     
   }
 
   drawStart(pointer:any){
     this.drawing = true;
-    // console.log(pointer.downX, pointer.downY, "drawStart");
     this.updateDrawView(pointer.downX, pointer.downY);
   }
 
   drawUpdate(pointer:any){
     if(this.drawing){
-      // console.log(pointer.worldX, pointer.worldY, "drawUpdate");
       this.updateDrawView(pointer.worldX, pointer.worldY);
     }
   }
@@ -206,29 +199,8 @@ export class StartScene extends Phaser.Scene {
       y: (y - this.container.y) / this.container.scale
     }
   }
-
-  resetHole(){
-    var {x, y, scale} = this.container;
-    this.hole.clear();
-    this.hole.fillStyle(0x020202, 0.8)
-    this.hole.beginPath();
-
-    this.hole.moveTo(0, 0);
-    this.hole.lineTo(0, this.stageHeight);
-    this.hole.lineTo(this.stageWidth, this.stageHeight);
-    this.hole.lineTo(this.stageWidth, 0);
-    this.hole.closePath();
-
-    this.hole.moveTo(x, y);
-    this.hole.lineTo(x + this.stageWidth * scale, y);
-    this.hole.lineTo(x + this.stageWidth * scale, y + this.stageHeight * scale);
-    this.hole.lineTo(x, y + this.stageHeight * scale);
-    this.hole.closePath();
-
-    this.hole.fill();
-  }
-
+  
   update(time: any): void {
-    this.resetHole();
+    
   }
 }

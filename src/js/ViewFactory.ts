@@ -3,7 +3,7 @@ export class ViewFactory{
 
     static normal(obj:Phaser.GameObjects.Image | Phaser.GameObjects.Polygon | Phaser.GameObjects.Text){
         obj.setOrigin(0, 0);
-        obj.setData("ratio", 1);
+        // obj.setData("ratio", 1);
     }
 
     static makeImage(scene:Phaser.Scene, key:string):Phaser.GameObjects.Image{
@@ -38,8 +38,9 @@ export class ViewFactory{
     static makeRect(scene:Phaser.Scene, color:number, width:number, height:number):Phaser.GameObjects.Polygon{
         var points:any = [0,0, width,0, width,height, 0,height];
         var rect = scene.add.polygon(0, 0, points, color);
+        rect.strokeColor = 0xaeaeae;
         ViewFactory.normal(rect);
-        rect.setData("color", color);
+        // rect.setData("color", color);
         return rect;
     }
 }
