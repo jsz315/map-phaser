@@ -1,7 +1,7 @@
 export class Point{
   
-  x:number;
-  y:number;
+  col:number;//第几列
+  row:number;//第几行
   
   parent:Point;
 
@@ -11,9 +11,9 @@ export class Point{
 
   type:number = 1;
   
-  constructor(x:number, y:number){
-    this.x = x;
-    this.y = y;
+  constructor(row:number, col:number){
+    this.row = row;
+    this.col = col;
   }
 
 }

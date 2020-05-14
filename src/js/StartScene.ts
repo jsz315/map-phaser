@@ -155,12 +155,14 @@ export class StartScene extends Phaser.Scene {
     });
 
     listener.on("test", ()=>{
+      console.log("[test]");
       var start:Point = this.mapView.mapData.find(MapData.TYPE_PLAYER);
       var end:Point = this.mapView.mapData.find(MapData.TYPE_AIM);
       var list = this.shortPath.find(start, end);
-      list.forEach(point=>{
-        point.type = MapData.TYPE_PLAYER;
+      list.forEach(item=>{
+        item.type = MapData.TYPE_PLAYER;
       })
+      this.mapView.update();
       console.log(list);
     });
 

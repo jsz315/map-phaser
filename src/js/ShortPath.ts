@@ -17,38 +17,56 @@ export class ShortPath{
     this.openList= [];
     this.closeList = [];
     this.openList.push(start);
-    var over:boolean = false;
-
-    while(this.openList.length && !over){
+    var running:boolean = true;
+    var timer:number = 0;
+    while(running){
+      console.log("timer", ++timer);
       var curPoint:Point = this.popMinCostPoint(start, end);
-      over = ShortPath.checkSame(curPoint, end) || curPoint == null;
-      if(!over){
-        var aroundList = this.getAroundPoint(start);
+      if(curPoint == null){
+        console.log("查找完毕");
+        running = false;
+      }
+      else{
+        if(ShortPath.checkSame(curPoint, end)){
+          console.log("成功找到");
+          running = false;
+        }
+        if(!ShortPath.checkContain(this.closeList, curPoint)){
+          this.closeList.push(curPoint);
+        }
+      }
+      if(running){
+        var aroundList = this.getAroundPoint(curPoint);
+        console.log(aroundList.length, "total");
         aroundList.forEach((point:Point) => {
-          var {x, y} = point;
-          if(this.mapData.points[x][y].type != MapData.TYPE_BLOCK && !this.checkContain(this.closeList, point)){
-            if(!this.checkContain(this.openList, point)){
-              this.openList.push(point);
-              ShortPath.calculateCost(start, end, point);
-              point.parent = curPoint;
-            }
-            else{
+          if(!ShortPath.checkContain(this.closeList, point)){
+            if(ShortPath.checkContain(this.openList, point)){
               ShortPath.updateCost(point);
               if(point.cost < curPoint.cost){
                 point.parent = curPoint;
               }
             }
+            else{
+              this.openList.push(point);
+              ShortPath.calculateCost(start, end, point);
+              point.parent = curPoint;
+            }
           }
         })
-        this.closeList.push(curPoint);
       }
     }
-    return this.closeList;
+    var aim = [end];
+    var node = end;
+    while(node.parent){
+      aim.push(node.parent);
+      node = node.parent
+    }
+    return aim;
   }
 
-  checkContain(list:Array<Point>, point:Point):boolean{
+  static checkContain(list:Array<Point>, point:Point):boolean{
     for(var i = 0; i < list.length; i++){
-      if(list[i].x == point.x && list[i].y == point.y){
+      if(ShortPath.checkSame(list[i], point)){
         return true;
       }
     }
@@ -57,13 +75,18 @@ export class ShortPath{
 
   getAroundPoint(p:Point):Array<Point>{
     var points = [];
-    var {x, y} = p;
+    var {row, col} = p;
     for(var i = -1; i <= 1; i++){
       for(var j = -1; j <= 1; j++){
         var isSelf = i == 0 && j == 0;
         var isCorner = i == j || i == -j;
         if(!isSelf && !isCorner){
-          points.push(new Point(x + i, y + j));
+          var ps = this.mapData.points;
+          if(ps[row + i] && ps[row + i][col + j]){
+            if(ps[row + i][col + j].type != MapData.TYPE_BLOCK){
+              points.push(ps[row + i][col + j]);
+            }
+          }
         }
       }
     }
@@ -75,12 +98,13 @@ export class ShortPath{
     var min = Infinity;
     var id:number = 0;
     this.openList.forEach((point:Point, index:number) => {
-      if(point.cost == 0){
-        ShortPath.calculateCost(start, end, point);
-      }
+      // if(point.cost == 0){
+      //   ShortPath.calculateCost(start, end, point);
+      // }
+      ShortPath.calculateCost(start, end, point);
       if(point.cost < min){
         aim = point;
-        id = index
+        id = index;
       } 
     })
 
@@ -89,7 +113,7 @@ export class ShortPath{
   }
 
   static checkSame(a:Point, b:Point):boolean{
-    return (a.x == b.x) && (a.y == b.y);
+    return (a.row == b.row) && (a.col == b.col);
   }
 
   static calculateCost(start:Point, end:Point, point:Point){
@@ -99,10 +123,10 @@ export class ShortPath{
   }
 
   static updateCost(point:Point){
-    point.cost = point.toEnd + point.parent.toStart;
+    point.cost = point.toEnd + point.parent.toStart + ShortPath.getDistance(point, point.parent);
   }
 
   static getDistance(a:Point, b:Point):number{
-    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+    return Math.sqrt(Math.pow(a.row - b.row, 2) + Math.pow(a.col - b.col, 2));
   }
 }
