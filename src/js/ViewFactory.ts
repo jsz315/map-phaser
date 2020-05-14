@@ -28,17 +28,26 @@ export class ViewFactory{
     static makeText(scene:Phaser.Scene, word:string, color:string = '#999999', size:number = 24, align:string = 'center'):Phaser.GameObjects.Text{
         var style = { font: size + "px PingFangSC-Semibold", fill: color, align: align };
         var text = scene.add.text(0, 0, word, style);
-        ViewFactory.normal(text);
-        text.setData("word", word);
-        text.setData("color", color);
-        text.setData("size", size);
+        if(align == 'left'){
+            text.setOrigin(0, 0.5);
+        }
+        else if(align == 'center'){
+            text.setOrigin(0.5, 0.5);
+        }
+        else if(align == 'right'){
+            text.setOrigin(1, 0.5);
+        }
+        // ViewFactory.normal(text);
+        // text.setData("word", word);
+        // text.setData("color", color);
+        // text.setData("size", size);
         return text;
     }
 
     static makeRect(scene:Phaser.Scene, color:number, width:number, height:number):Phaser.GameObjects.Polygon{
         var points:any = [0,0, width,0, width,height, 0,height];
         var rect = scene.add.polygon(0, 0, points, color);
-        rect.strokeColor = 0xaeaeae;
+        rect.setStrokeStyle(2, 0xaeaeae);
         ViewFactory.normal(rect);
         // rect.setData("color", color);
         return rect;
