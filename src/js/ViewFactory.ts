@@ -9,7 +9,7 @@ export class ViewFactory{
     static makeImage(scene:Phaser.Scene, key:string):Phaser.GameObjects.Image{
         var img = scene.add.image(0, 0, key);
         ViewFactory.normal(img);
-        img.setData("name", key);
+        // img.setData("name", key);
         return img;
     }
 

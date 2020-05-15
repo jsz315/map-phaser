@@ -5,11 +5,11 @@ function init(param){
     var dom = param.dom;
     var onScale = param.onScale || function(n){};
     var onCenter = param.onCenter || function(x, y){};
-    var onMove = param.onMove || function(x, y, total){};
+    var onMove = param.onMove || function(x, y, total, clientX, clientY){};
     var onEnd = param.onEnd || function(){};
     var onTap = param.onTap || function(x, y){};
     var onSelect = param.onSelect || function(x, y){};
-    var isMobile = checkMobile();
+    // var isMobile = checkMobile();
 
     var moving = false;
     var startPoint = {x: 0, y: 0};
@@ -20,7 +20,6 @@ function init(param){
         var ts = e.targetTouches;
         console.log(e);
         e.preventDefault();
-        
         if(ts.length == 1){
             startPoint = toPoint(ts[0]);
             onTap(startPoint.x, startPoint.y);
@@ -61,7 +60,7 @@ function init(param){
             startDistance && onScale(endDistance / startDistance);
             // endPoint && onMove(endPoint.x - startPoint.x, endPoint.y - startPoint.y);
         }
-        endPoint && onMove(endPoint.x - startPoint.x, endPoint.y - startPoint.y, ts.length);
+        endPoint && onMove(endPoint.x - startPoint.x, endPoint.y - startPoint.y, ts.length, ts[0].clientX, ts[0].clientY);
     }
 }
 

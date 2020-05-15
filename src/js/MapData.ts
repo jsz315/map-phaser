@@ -31,7 +31,7 @@ export class MapData{
             for(var j = 0; j < this.col; j++){
                 // this.data[i][j] = MapData.TYPE_BLOCK;
                 this.points[i][j] = new Point(i, j);
-                this.points[i][j].type = MapData.TYPE_BLOCK;
+                this.points[i][j].type = MapData.TYPE_FREE;
             }
         }
     }

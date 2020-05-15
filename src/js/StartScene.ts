@@ -6,6 +6,7 @@ import { MapView } from './MapView';
 import { MapData } from './MapData';
 import { ShortPath } from './ShortPath';
 import { Point } from './Point';
+import { PenView } from './PenView';
 
 export class StartScene extends Phaser.Scene {
     stage: Phaser.GameObjects.Polygon;
@@ -25,10 +26,11 @@ export class StartScene extends Phaser.Scene {
     rects: any[] = [];
     center: any = {};
     offset: any = {};
-    size: number = 120;
+    size: number = 750 / 12;
     mapView: MapView;
     clickType: number = MapData.TYPE_FREE;
     shortPath: ShortPath;
+    penView:PenView;
 
     constructor() {
         super({
@@ -43,6 +45,11 @@ export class StartScene extends Phaser.Scene {
     preload(): void {
         // this.load.setBaseURL('http://labs.phaser.io');
         // this.load.image('logo', 'assets/sprites/phaser3-logo.png');
+        this.load.setBaseURL('/');
+        this.load.image(PenView.key, PenView.path);
+        this.load.image('wall', 'wall.jpg');
+        this.load.image('food', 'food.png');
+        this.load.image('dog', 'dog.png');
     }
 
     create(): void {
@@ -55,6 +62,9 @@ export class StartScene extends Phaser.Scene {
 
         this.shortPath = new ShortPath(this.mapView.mapData);
         this.addEvent();
+
+        this.penView = new PenView(this);
+        this.add.container(40, 40, this.penView);
     }
 
     addEvent() {
@@ -122,22 +132,30 @@ export class StartScene extends Phaser.Scene {
         listener.on("tap", (x: number, y: number) => {
             console.log("tap")
             this.updateDrawView(x, y);
-            // var p = this.worldToContainer(x, y);
-            // this.centerX = p.x;
-            // this.centerY = p.y;
+            this.penView.show();
+            this.penView.x = x;
+            this.penView.y = y;
         })
 
-        listener.on("move", (x: number, y: number, total: number) => {
+        listener.on("move", (x: number, y: number, total: number, point: any) => {
             if (total > 1) {
                 this.container.x = this.stageX + x;
                 this.container.y = this.stageY + y;
+                this.penView.hide();
             }
+            else{
+                this.penView.show();
+            }
+            this.penView.x = point.x;
+            this.penView.y = point.y;
+
         })
 
         listener.on("end", () => {
             this.stageScale = this.container.scale;
             this.stageX = this.container.x;
             this.stageY = this.container.y;
+            this.penView.hide();
         })
 
         listener.on("select", (x: number, y: number) => {
@@ -150,7 +168,6 @@ export class StartScene extends Phaser.Scene {
         });
 
         listener.on("test", () => {
-            console.log("[test]");
             var start: Point = this.mapView.mapData.find(MapData.TYPE_PLAYER);
             var end: Point = this.mapView.mapData.find(MapData.TYPE_AIM);
             var list = this.shortPath.find(start, end);

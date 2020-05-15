@@ -4,7 +4,8 @@
         <File ref="file" />
         <Setting ref="setting" />
         <div class="btns">
-            <div class="btn" @click="onDraw">绘图</div>
+            <div class="btn" @click="onWall">画墙</div>
+            <div class="btn" @click="onRoad">画路</div>
             <div class="btn" @click="onStart">起点</div>
             <div class="btn" @click="onAim">终点</div>
             <div class="btn" @click="onTest">测试</div>
@@ -27,7 +28,7 @@
 <script>
 
     // import Hammer from 'hammerjs';
-    import game from '../../js/App.ts'
+    import game from '../../js/Game.ts'
     import listener from '../../js/listener'
     import { MapData } from '../../js/MapData'
     import touch from '../../js/touch'
@@ -63,7 +64,11 @@
             this.useMine(canvas);
         },
         methods: {
-            onDraw() {
+            onWall() {
+                console.log('onDraw');
+                listener.emit("change_type", MapData.TYPE_BLOCK);
+            },
+            onRoad() {
                 console.log('onDraw');
                 listener.emit("change_type", MapData.TYPE_FREE);
             },
@@ -95,11 +100,11 @@
                         this.centerY = p.y;
                         listener.emit("center", p.x, p.y);
                     },
-                    onMove: (x, y, total) => {
+                    onMove: (x, y, total, clientX, clientY) => {
                         var p = this.toCanvas(x, y);
                         vm.x = p.x;
                         vm.y = p.y;
-                        listener.emit("move", p.x, p.y, total);
+                        listener.emit("move", p.x, p.y, total, this.toCanvas(clientX, clientY));
                     },
                     onEnd: () => {
                         listener.emit("end");

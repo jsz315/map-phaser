@@ -54,7 +54,7 @@ export class MapView extends Phaser.GameObjects.Container {
             this.views[i] = [];
             for(var j = 0; j < this.mapData.col; j++){
                 // var view = ViewFactory.makeRect(this.scene, this.getColor(i, j), this.size, this.size);
-                var view = new RectView(this.scene, this.size, MapView.COLOR_BLOCK);
+                var view = new RectView(this.scene, this.size, MapView.COLOR_FREE);
                 view.x = j * this.size;
                 view.y = i * this.size;
                 this.views[i][j] = view;

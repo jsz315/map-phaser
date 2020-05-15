@@ -8,7 +8,6 @@ function init(canvas:HTMLCanvasElement){
         canvas: canvas,
         backgroundColor: 0xffffff,
         width: 750,
-        // height: window.innerHeight * 0.84
         height: 750
     }
     new Phaser.Game(config);
