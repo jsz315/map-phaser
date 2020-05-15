@@ -16,7 +16,7 @@ export class ShortPath {
         this.openList = [];
         this.closeList = [];
         this.openList.push(start);
-        ShortPath.calculateCost(start, end, start);
+        ShortPath.calculateCost(end, start);
         var running: boolean = true;
         var timer: number = Date.now();
         while (running) {
@@ -40,17 +40,17 @@ export class ShortPath {
                 aroundList.forEach((point: Point) => {
                     if (!ShortPath.checkContain(this.closeList, point)) {
                         if (ShortPath.checkContain(this.openList, point)) {
-                            // var oldStart = point.toStart;
-                            // var newStart = curPoint.toStart + ShortPath.getDistance(point, curPoint);
-                            // if (newStart < oldStart) {
-                            //     point.toStart = newStart;
-                            //     point.cost = point.toStart + point.toEnd;
-                            //     point.parent = curPoint;
-                            // }
+                            var oldStart = point.toStart;
+                            var newStart = 1 + curPoint.toStart;
+                            if (newStart < oldStart) {
+                                point.toStart = newStart;
+                                point.cost = point.toStart + point.toEnd;
+                                point.parent = curPoint;
+                            }
                         }
                         else {
                             this.openList.push(point);
-                            ShortPath.calculateCost(curPoint, end, point);
+                            ShortPath.calculateCost(end, point);
                             point.parent = curPoint;
                         }
                     }
@@ -105,17 +105,19 @@ export class ShortPath {
     popMinCostPoint(start: Point, end: Point): Point {
         var aim: any;
         var min = Infinity;
-        var id: number = 0;
+        var id:number = 0;
+        if(this.openList.length == 0){
+            return aim;
+        }
         this.openList.forEach((point: Point, index: number) => {
             //   ShortPath.calculateCost(start, end, point);
             if (point.cost < min) {
                 aim = point;
+                min = point.cost;
                 id = index;
             }
         })
-
         this.openList.splice(id, 1);
-        console.log(`id = ${id} 最小代价${aim.cost} (${aim.row}, ${aim.col})`);
         return aim;
     }
 
@@ -123,9 +125,10 @@ export class ShortPath {
         return (a.row == b.row) && (a.col == b.col);
     }
 
-    static calculateCost(start: Point, end: Point, point: Point) {
-        // point.toStart = ShortPath.getDistance(start, point);
-        point.toStart = start.toStart + ShortPath.getDistance(point, start);
+    static calculateCost(end: Point, point: Point) {
+        if(point.parent){
+            point.toStart = point.parent.toStart + 1;
+        }
         point.toEnd = ShortPath.getDistance(end, point);
         point.cost = point.toStart + point.toEnd;
     }
