@@ -16,11 +16,11 @@ export class ShortPath {
         this.openList = [];
         this.closeList = [];
         this.openList.push(start);
-        ShortPath.calculateCost(end, start);
+        ShortPath.calculateCost(start, end, start);
         var running: boolean = true;
         var timer: number = Date.now();
         while (running) {
-            var curPoint: Point = this.popMinCostPoint(start, end);
+            var curPoint: Point = this.popMinCostPoint();
             if (curPoint == null) {
                 console.log("查找完毕");
                 running = false;
@@ -50,7 +50,7 @@ export class ShortPath {
                         }
                         else {
                             this.openList.push(point);
-                            ShortPath.calculateCost(end, point);
+                            ShortPath.calculateCost(start, end, point);
                             point.parent = curPoint;
                         }
                     }
@@ -102,7 +102,7 @@ export class ShortPath {
         return points;
     }
 
-    popMinCostPoint(start: Point, end: Point): Point {
+    popMinCostPoint(): Point {
         var aim: any;
         var min = Infinity;
         var id:number = 0;
@@ -125,9 +125,12 @@ export class ShortPath {
         return (a.row == b.row) && (a.col == b.col);
     }
 
-    static calculateCost(end: Point, point: Point) {
+    static calculateCost(start:Point, end: Point, point: Point) {
         if(point.parent){
             point.toStart = point.parent.toStart + 1;
+        }
+        else{
+            point.toStart = ShortPath.getDistance(start, point);
         }
         point.toEnd = ShortPath.getDistance(end, point);
         point.cost = point.toStart + point.toEnd;
