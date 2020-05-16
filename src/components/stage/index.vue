@@ -34,8 +34,7 @@
     import touch from '../../js/touch'
     import File from '../file/index.vue'
     import Setting from '../setting/index.vue'
-
-
+    import sudo from '../../js/sudo'
 
     export default {
         name: 'stage',
@@ -85,6 +84,10 @@
             },
             onReset() {
                 listener.emit("reset");
+                var t = sudo.generate();
+                console.log(JSON.parse(JSON.stringify(t)));
+                // var t = sudo.fill();
+                // console.log(JSON.parse(JSON.stringify(t)));
             },
             useMine(canvas) {
                 var vm = this;

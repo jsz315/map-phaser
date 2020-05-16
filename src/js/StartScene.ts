@@ -26,7 +26,7 @@ export class StartScene extends Phaser.Scene {
     rects: any[] = [];
     center: any = {};
     offset: any = {};
-    size: number = 750 / 12;
+    size: number = 750 / 9;
     mapView: MapView;
     clickType: number = MapData.TYPE_FREE;
     shortPath: ShortPath;
