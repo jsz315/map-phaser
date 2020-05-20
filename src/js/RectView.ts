@@ -12,12 +12,26 @@ export class RectView extends Phaser.GameObjects.Container {
     color:number;
     background:Phaser.GameObjects.Polygon;
     wall:Phaser.GameObjects.Image;
-
+    graphics: Phaser.GameObjects.Graphics;
     constructor(scene:Phaser.Scene, size:number, color:number){
         super(scene);
         this.color = color;
         this.size = size;
         this.createViews();
+
+
+       
+        this.graphics = new Phaser.GameObjects.Graphics(scene);
+        this.graphics.fillStyle(0x550033, 0.2);
+        this.graphics.fillRect(0, 0, size / 1.2, size / 1.2);
+        // this.graphics.createBitmapMask();
+        this.graphics.createBitmapMask(this.background);
+        // this.graphics.setTexture('wall', 0, 2);
+        
+        this.add(this.graphics);
+
+        this.graphics.x = 4;
+        this.graphics.y = 4;
     }
 
     changeColor(color:number){

@@ -10,6 +10,7 @@
             <div class="btn" @click="onAim">终点</div>
             <div class="btn" @click="onTest">测试</div>
             <div class="btn" @click="onReset">重置</div>
+            <div class="btn" @click="onStep">单步</div>
         </div>
         <div class="debug">
             <div class="tip">type: {{type}}</div>
@@ -35,6 +36,7 @@
     import File from '../file/index.vue'
     import Setting from '../setting/index.vue'
     import sudo from '../../js/sudo'
+    import mysudo from '../../js/mysudo'
 
     export default {
         name: 'stage',
@@ -88,6 +90,9 @@
                 console.log(JSON.parse(JSON.stringify(t)));
                 // var t = sudo.fill();
                 // console.log(JSON.parse(JSON.stringify(t)));
+            },
+            onStep(){
+                mysudo.nextFill();
             },
             useMine(canvas) {
                 var vm = this;
