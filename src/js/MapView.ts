@@ -16,8 +16,8 @@ export class MapView extends Phaser.GameObjects.Container {
 
     constructor(scene:Phaser.Scene, width:number, height:number, size:number){
         super(scene);
-        this.width = width;
-        this.height = height;
+        // this.width = width;
+        // this.height = height;
         this.size = size;
         var col = Math.ceil(width / this.size);
         var row = Math.ceil(height / this.size);

@@ -6,9 +6,13 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     version: 1.0,
-    assets: []
+    assets: [],
+    isLandscape: false
   },
   mutations: {
+    changeIsLandscape(state, value){
+        state.isLandscape = value
+    },
     changeVersion(state, value){
       state.version = value;
     },
@@ -17,7 +21,9 @@ export default new Vuex.Store({
     }
   },
   actions: {
+
   },
   modules: {
+
   }
 })

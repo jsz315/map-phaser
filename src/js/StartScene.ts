@@ -7,6 +7,7 @@ import { MapData } from './MapData';
 import { ShortPath } from './ShortPath';
 import { Point } from './Point';
 import { PenView } from './PenView';
+import { Player } from './Player';
 
 export class StartScene extends Phaser.Scene {
     stage: Phaser.GameObjects.Polygon;
@@ -28,6 +29,7 @@ export class StartScene extends Phaser.Scene {
     offset: any = {};
     size: number = 750 / 9;
     mapView: MapView;
+    player: Player;
     clickType: number = MapData.TYPE_FREE;
     shortPath: ShortPath;
     penView:PenView;
@@ -49,7 +51,7 @@ export class StartScene extends Phaser.Scene {
         this.load.image(PenView.key, PenView.path);
         this.load.image('wall', 'wall.jpg');
         this.load.image('food', 'food.png');
-        this.load.image('dog', 'dog.png');
+        this.load.image(Player.key, Player.path);
     }
 
     create(): void {
@@ -65,18 +67,82 @@ export class StartScene extends Phaser.Scene {
 
         this.penView = new PenView(this);
         this.add.container(40, 40, this.penView);
+
+        this.player = new Player(this);
+        this.container.add(this.player);
+
+        console.log(this.mapView, 'mapView');
+        console.log(this.player, 'player');
+    }
+
+    onScale(num:number){
+        console.log(num);
+        // var oldX = this.container.scale * this.stageWidth;
+        // var oldY = this.container.scale * this.stageHeight;
+        // this.container.scale = num;
+        // var newX = this.container.scale * this.stageWidth;
+        // var newY = this.container.scale * this.stageHeight;
+
+        // var center = this.worldToContainer(sx, sy);
+
+        // var offsetX = 0.5;
+        // var offsetY = 0.5;
+        // console.log(offsetX, offsetY);
+        // this.container.x -= (newX - oldX) * offsetX;
+        // this.container.y -= (newY - oldY) * offsetY;
+        // this.offset = { x: offsetX, y: offsetY };
+
+        var oldX = this.container.scale * this.stageWidth;
+        var oldY = this.container.scale * this.stageHeight;
+        // this.container.scale = this.stageScale * num;
+        this.container.scale = num;
+        var newX = this.container.scale * this.stageWidth;
+        var newY = this.container.scale * this.stageHeight;
+        // this.container.x -= (newX - oldX) / 2;
+        // this.container.y -= (newY - oldY) / 2;
+
+        var offsetX = (this.centerX - this.container.x) / this.stageWidth;
+        var offsetY = (this.centerY - this.container.y) / this.stageHeight;
+        // console.log(offsetX, offsetY);
+        this.container.x -= (newX - oldX) * offsetX;
+        this.container.y -= (newY - oldY) * offsetY;
+
+        // if (e.clientX == this.center.x && e.clientY == this.center.y) {
+        //     this.container.x -= (newX - oldX) * this.offset.x;
+        //     this.container.y -= (newY - oldY) * this.offset.y;
+        // }
+        // else {
+        //     console.log(this.game.canvas.offsetLeft, this.game.canvas.offsetTop, "offset")
+        //     var sx = e.clientX - this.game.canvas.offsetLeft;
+        //     var sy = e.clientY - this.game.canvas.offsetTop;
+        //     var center = this.worldToContainer(sx, sy);
+
+        //     var offsetX = center.x / this.stageWidth;
+        //     var offsetY = center.y / this.stageHeight;
+        //     console.log(offsetX, offsetY);
+        //     this.container.x -= (newX - oldX) * offsetX;
+        //     this.container.y -= (newY - oldY) * offsetY;
+        //     this.offset = { x: offsetX, y: offsetY };
+        // }
+
+        // this.center = { x: e.clientX, y: e.clientY };
     }
 
     addEvent() {
         window.addEventListener("mousewheel", (e: any) => {
-            var oldX = this.container.scale * this.stageWidth;
-            var oldY = this.container.scale * this.stageHeight;
+            // var oldX = this.container.scale * this.stageWidth;
+            // var oldY = this.container.scale * this.stageHeight;
+            listener.emit("center", e.clientX, e.clientY);
+
             if (e.deltaY > 0) {
-                this.container.scale *= 0.9;
+                // this.container.scale *= 0.9;
+                this.onScale(this.container.scale * 0.9);
             }
             else {
-                this.container.scale *= 1.1;
+                // this.container.scale *= 1.1;
+                this.onScale(this.container.scale * 1.1);
             }
+            /*
             var newX = this.container.scale * this.stageWidth;
             var newY = this.container.scale * this.stageHeight;
 
@@ -99,6 +165,7 @@ export class StartScene extends Phaser.Scene {
             }
 
             this.center = { x: e.clientX, y: e.clientY };
+            */
         })
 
         // this.stage.setInteractive();
@@ -107,6 +174,8 @@ export class StartScene extends Phaser.Scene {
         // this.stage.on('pointerup', this.drawStop, this);
 
         listener.on("scale", (num: number) => {
+            this.onScale(this.stageScale * num);
+            /*
             var oldX = this.container.scale * this.stageWidth;
             var oldY = this.container.scale * this.stageHeight;
             this.container.scale = this.stageScale * num;
@@ -119,11 +188,12 @@ export class StartScene extends Phaser.Scene {
             console.log(offsetX, offsetY);
             this.container.x -= (newX - oldX) * offsetX;
             this.container.y -= (newY - oldY) * offsetY;
+            */
         })
 
         listener.on("center", (x: number, y: number) => {
             // worldToContainer(x, y)
-            this.updateDrawView(x, y);
+            // this.updateDrawView(x, y);
             var p = this.worldToContainer(x, y);
             this.centerX = p.x;
             this.centerY = p.y;
@@ -163,7 +233,7 @@ export class StartScene extends Phaser.Scene {
         })
 
         listener.on("change_type", (type: number) => {
-            console.log('change_type', type);
+            // console.log('change_type', type);
             this.clickType = type;
         });
 

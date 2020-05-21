@@ -12,16 +12,16 @@
             <div class="btn" @click="onReset">重置</div>
             <div class="btn" @click="onStep">单步</div>
         </div>
-        <div class="debug">
-            <div class="tip">type: {{type}}</div>
+        <div class="debug" :style="{width: isLandscape ? '30vw' : 'auto'}">
+            <div class="tip">size: {{size}}</div>
             <div class="tip">scale: {{scale}}</div>
             <div class="tip">rotation: {{rotation}}</div>
             <div class="tip">x: {{x}}</div>
             <div class="tip">y: {{y}}</div>
+            <input type="text"/>
+            <div class="tip">{{dir}}</div>
             <div class="tip">clientX: {{clientX}}</div>
             <div class="tip">clientY: {{clientY}}</div>
-            <div class="tip">centerX: {{centerX}}</div>
-            <div class="tip">centerY: {{centerY}}</div>
         </div>
     </div>
 </template>
@@ -37,6 +37,7 @@
     import Setting from '../setting/index.vue'
     import sudo from '../../js/sudo'
     import mysudo from '../../js/mysudo'
+    import {mapState, mapMutations} from 'vuex'
 
     export default {
         name: 'stage',
@@ -50,8 +51,13 @@
                 clientX: 0,
                 clientY: 0,
                 centerX: 0,
-                centerY: 0
+                centerY: 0,
+                dir: '竖屏',
+                size: window.innerWidth + " * " + window.innerHeight
             }
+        },
+        computed: {
+            ...mapState(['isLandscape'])
         },
         props: {
             msg: String
@@ -59,10 +65,31 @@
         components: {
             File, Setting
         },
+        watch: {
+            isLandscape(newValue, oldValue) {
+                if(newValue){
+                    console.log("横屏")
+                }
+            },
+        },
         mounted() {
             var canvas = this.$refs.canvas;
             game.init(canvas);
             this.useMine(canvas);
+
+            window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", ()=>{
+                var isLandscape;
+                if (window.orientation === 180 || window.orientation === 0) {
+                    this.dir = '竖屏状态！';
+                    isLandscape = false;
+                }
+                if (window.orientation === 90 || window.orientation === -90 ){
+                    this.dir = '横屏状态！';
+                    isLandscape = true;
+                } 
+                this.size = window.innerWidth + " * " + window.innerHeight;
+                this.$store.commit("changeIsLandscape", isLandscape);
+            }, false);
         },
         methods: {
             onWall() {
