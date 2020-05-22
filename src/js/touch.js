@@ -39,7 +39,7 @@ function init(param){
             onEnd();
         });
 
-    })
+    }, {passive: false})
 
     function onTouchMove(e){
         if(!moving){

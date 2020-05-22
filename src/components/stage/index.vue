@@ -75,7 +75,7 @@
         mounted() {
             var canvas = this.$refs.canvas;
             game.init(canvas);
-            this.useMine(canvas);
+            // this.useMine(canvas);
 
             window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", ()=>{
                 var isLandscape;

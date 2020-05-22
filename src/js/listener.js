@@ -19,10 +19,10 @@ listener.emit = function(){
 
 
 listener.make = function(dom, type, callback){
-    dom.addEventListener(type, callback);
+    dom.addEventListener(type, callback, {passive: false});
     return {
         destroy() {
-            dom.removeEventListener(type, callback);
+            dom.removeEventListener(type, callback, {passive: false});
         },
     };
 }

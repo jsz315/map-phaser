@@ -3,10 +3,10 @@ import {MapData} from './MapData'
 import {ViewFactory} from './ViewFactory'
 import { RectView } from './RectView';
 
-export class Player extends Phaser.GameObjects.Container {
+export class Food extends Phaser.GameObjects.Container {
 
-    static key:string = 'dog'
-    static path:string = 'dog.png';
+    static key:string = 'food'
+    static path:string = 'food.png';
     
     startPot:any;
 
@@ -15,10 +15,11 @@ export class Player extends Phaser.GameObjects.Container {
     constructor(scene:Phaser.Scene){
         super(scene)
 
-        this.view = this.scene.add.image(0, 0, Player.key);
+        this.view = this.scene.add.image(0, 0, Food.key);
         this.add(this.view);
         this.view.setOrigin(0, 0);
         this.view.scale = 80 / this.view.width;
+
         this.view.setInteractive();
         
         scene.input.setDraggable(this.view);

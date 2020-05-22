@@ -8,6 +8,8 @@ import { ShortPath } from './ShortPath';
 import { Point } from './Point';
 import { PenView } from './PenView';
 import { Player } from './Player';
+import { Food } from './Food';
+import { ZoomView } from './ZoomView';
 
 export class StartScene extends Phaser.Scene {
     stage: Phaser.GameObjects.Polygon;
@@ -30,9 +32,15 @@ export class StartScene extends Phaser.Scene {
     size: number = 750 / 9;
     mapView: MapView;
     player: Player;
+    food: Food;
     clickType: number = MapData.TYPE_FREE;
     shortPath: ShortPath;
     penView:PenView;
+    zoomView:ZoomView;
+
+    startPoint: any;
+
+    scaleView:Phaser.GameObjects.Image;
 
     constructor() {
         super({
@@ -50,7 +58,7 @@ export class StartScene extends Phaser.Scene {
         this.load.setBaseURL('/');
         this.load.image(PenView.key, PenView.path);
         this.load.image('wall', 'wall.jpg');
-        this.load.image('food', 'food.png');
+        this.load.image(Food.key, Food.path);
         this.load.image(Player.key, Player.path);
     }
 
@@ -71,12 +79,93 @@ export class StartScene extends Phaser.Scene {
         this.player = new Player(this);
         this.container.add(this.player);
 
-        console.log(this.mapView, 'mapView');
-        console.log(this.player, 'player');
+        this.food = new Food(this);
+        this.container.add(this.food);
+
+        this.input.on("drag", (pointer:any, gameObject:any, dragX:any, dragY:any)=>{
+            console.log(dragY, 'dragY', gameObject);
+            if(gameObject == this.zoomView.view){
+                console.log("zoom");
+            }
+            else if(gameObject == this.scaleView){
+
+                var h = this.stageHeight / 2;
+                if(dragY - h > 0){
+                    this.onScale(this.container.scale * 1.12);
+                }
+                else{
+                    this.onScale(this.container.scale * 0.9);
+                }
+            }
+            else{
+                gameObject.x = dragX;
+                gameObject.y = dragY;
+            }
+            
+        })
+
+        this.input.on('pointerdown', (data:any)=>{
+            var e = data.event.changedTouches;
+            this.startPoint = {
+                x: e[0].clientX,
+                y: e[0].clientY
+            }
+        })
+
+        this.input.on('pointermove', (data:any)=>{
+            var e = data.event.changedTouches;
+            if(e.length == 2){
+                console.log("pointermove", data);
+                this.container.x += e[0].clientX - this.startPoint.x;
+                this.container.y += e[0].clientY - this.startPoint.y;
+               
+                this.startPoint = {
+                    x: e[0].clientX,
+                    y: e[0].clientY
+                }
+            }
+        })
+
+
+        this.input.on('pointerup', (data:any)=>{
+            var e = data.event.changedTouches;
+            if(e.length == 2){
+                console.log(data);
+            }
+            this.startPoint = null;
+        })
+
+
+        // console.log(this.mapView, 'mapView');
+        // console.log(this.player, 'player');
+
+        // this.cameras.main.setBounds(0, 0, 1024, 1024);
+        // this.cameras.main.centerOn(0, 0);
+        // this.cameras.main.setBackgroundColor(0x993300);
+        // console.log('camera', this.cameras);
+
+        this.scaleView = this.add.image(300, 200, Food.key);
+        this.scaleView.scale = 80 / this.scaleView.width;
+        this.scaleView.x = this.stageWidth - 100;
+        this.scaleView.y = this.stageHeight / 2;
+        // this.scaleView.setScrollFactor(0, 0);
+        this.scaleView.setInteractive();
+        this.input.setDraggable(this.scaleView);
+
+
+        this.zoomView = new ZoomView(this);
+        this.add.container(200, 100, this.zoomView);
     }
 
     onScale(num:number){
-        console.log(num);
+        
+        if(num > 0.2 && num < 4){
+            this.stageScale = num;
+            // this.cameras.main.setZoom(num);
+            this.container.scale = num;
+        }
+        
+        // console.log(num);
         // var oldX = this.container.scale * this.stageWidth;
         // var oldY = this.container.scale * this.stageHeight;
         // this.container.scale = num;
@@ -91,6 +180,7 @@ export class StartScene extends Phaser.Scene {
         // this.container.x -= (newX - oldX) * offsetX;
         // this.container.y -= (newY - oldY) * offsetY;
         // this.offset = { x: offsetX, y: offsetY };
+        /*
 
         var oldX = this.container.scale * this.stageWidth;
         var oldY = this.container.scale * this.stageHeight;
@@ -106,6 +196,7 @@ export class StartScene extends Phaser.Scene {
         // console.log(offsetX, offsetY);
         this.container.x -= (newX - oldX) * offsetX;
         this.container.y -= (newY - oldY) * offsetY;
+        */
 
         // if (e.clientX == this.center.x && e.clientY == this.center.y) {
         //     this.container.x -= (newX - oldX) * this.offset.x;
@@ -136,11 +227,11 @@ export class StartScene extends Phaser.Scene {
 
             if (e.deltaY > 0) {
                 // this.container.scale *= 0.9;
-                this.onScale(this.container.scale * 0.9);
+                this.onScale(this.stageScale * 0.9);
             }
             else {
                 // this.container.scale *= 1.1;
-                this.onScale(this.container.scale * 1.1);
+                this.onScale(this.stageScale * 1.1);
             }
             /*
             var newX = this.container.scale * this.stageWidth;
@@ -200,7 +291,7 @@ export class StartScene extends Phaser.Scene {
         })
 
         listener.on("tap", (x: number, y: number) => {
-            console.log("tap")
+            // console.log("tap")
             this.updateDrawView(x, y);
             this.penView.show();
             this.penView.x = x;
@@ -211,6 +302,15 @@ export class StartScene extends Phaser.Scene {
             if (total > 1) {
                 this.container.x = this.stageX + x;
                 this.container.y = this.stageY + y;
+                // this.cameras.main.x = x;
+                // this.cameras.main.y = y;
+
+                // var camera = this.cameras.main;
+                // this.cameras.main.pan(-x, -y, 100);
+                // camera.centerOn(camera.centerX - x, camera.centerY - y);
+
+                // this.cameras.main.centerOn(x, y);
+
                 this.penView.hide();
             }
             else{
@@ -222,7 +322,7 @@ export class StartScene extends Phaser.Scene {
         })
 
         listener.on("end", () => {
-            this.stageScale = this.container.scale;
+            // this.stageScale = this.container.scale;
             this.stageX = this.container.x;
             this.stageY = this.container.y;
             this.penView.hide();
